@@ -13,7 +13,7 @@ import { initAI } from './ai/index.js';
 import { authManager } from './auth/index.js';
 import { registerCommands } from './commands/register.js';
 import { UserError } from './errors/types.js';
-import pkg from '../package.json' assert { type: 'json' };
+import pkg from '../package.json' with { type: 'json' };
 
 // Get version from package.json
 const version = pkg.version;

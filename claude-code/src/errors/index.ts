@@ -5,7 +5,7 @@
  */
 
 import { logger } from '../utils/logger.js';
-import { ErrorLevel, ErrorCategory, ErrorManager, ErrorOptions } from './types.js';
+import { ErrorLevel, ErrorCategory, ErrorManager, ErrorOptions, UserError, UserErrorOptions } from './types.js';
 import { formatErrorForDisplay } from './formatter.js';
 import { setupSentryReporting } from './sentry.js';
 import { setupConsoleErrorHandling } from './console.js';
@@ -41,6 +41,22 @@ export function initErrorHandling(): ErrorManager {
 class ErrorHandlerImpl implements ErrorManager {
   private errorCount: Map<string, number> = new Map();
   private readonly MAX_ERRORS = 100;
+  
+  /**
+   * Initialize the error manager
+   */
+  async initialize(): Promise<void> {
+    // Initialize error handling components
+    logger.debug('Error manager initialized');
+    return Promise.resolve();
+  }
+  
+  /**
+   * Create a user error
+   */
+  createUserError(message: string, options?: UserErrorOptions): UserError {
+    return new UserError(message, options);
+  }
   
   /**
    * Handle a fatal error that should terminate the application
@@ -97,32 +113,32 @@ class ErrorHandlerImpl implements ErrorManager {
     // Format the error
     const formattedError = this.formatError(error, options);
     
-    // Log the error based on level
-    switch (level) {
-      case ErrorLevel.CRITICAL:
-      case ErrorLevel.MAJOR:
-        logger.error(`[${ErrorCategory[category]}] ${formattedError.message}`, formattedError);
-        break;
-      case ErrorLevel.MINOR:
-        logger.warn(`[${ErrorCategory[category]}] ${formattedError.message}`, formattedError);
-        break;
-      case ErrorLevel.INFORMATIONAL:
-        logger.info(`[${ErrorCategory[category]}] ${formattedError.message}`, formattedError);
-        break;
-    }
+    // Convert the level to a number to make comparison easier
+    const levelValue = level as number;
     
-    // Report to telemetry/monitoring if appropriate
-    if (level === ErrorLevel.CRITICAL || level === ErrorLevel.MAJOR) {
+    // Log the error based on level groups
+    if (levelValue <= ErrorLevel.MAJOR || 
+        levelValue === ErrorLevel.ERROR ||
+        levelValue === ErrorLevel.FATAL) {
+      // Serious errors
+      logger.error(`[${ErrorCategory[category]}] ${formattedError.message}`, formattedError);
+      // Report to telemetry/monitoring
       this.reportError(formattedError, options);
+    } else if (levelValue === ErrorLevel.MINOR || levelValue === ErrorLevel.WARNING) {
+      // Warnings
+      logger.warn(`[${ErrorCategory[category]}] ${formattedError.message}`, formattedError);
+    } else {
+      // Informational
+      logger.info(`[${ErrorCategory[category]}] ${formattedError.message}`, formattedError);
     }
   }
   
   /**
    * Format an error object for consistent handling
    */
-  private formatError(error: unknown, options: ErrorOptions = {}): any {
+  formatError(error: unknown, options: ErrorOptions = {}): any {
     try {
-      return formatErrorForDisplay(error, options);
+      return formatErrorForDisplay(error);
     } catch (formattingError) {
       // If formatting fails, return a basic error object
       return {
@@ -153,7 +169,7 @@ class ErrorHandlerImpl implements ErrorManager {
   /**
    * Report an error to monitoring/telemetry systems
    */
-  private reportError(error: any, options: ErrorOptions = {}): void {
+  reportError(error: any, options: ErrorOptions = {}): void {
     // We're skipping Sentry SDK as requested
     // In a real implementation, this would send the error to Sentry
     

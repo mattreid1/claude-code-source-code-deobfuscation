@@ -250,4 +250,28 @@ if (process.env.NODE_ENV === 'development' || process.env.DEBUG === 'true') {
   }
 }
 
+/**
+ * Configure logger from application config
+ */
+export function configureLogger(config: any): void {
+  if (config?.logging) {
+    const loggingConfig = config.logging;
+    
+    // Configure log level
+    if (loggingConfig.level) {
+      const level = LogLevel[loggingConfig.level.toUpperCase() as keyof typeof LogLevel];
+      if (level !== undefined) {
+        logger.setLevel(level);
+      }
+    }
+    
+    // Configure other options
+    logger.configure({
+      verbose: loggingConfig.verbose === true,
+      timestamps: loggingConfig.timestamps !== false,
+      colors: loggingConfig.colors !== false
+    });
+  }
+}
+
 export default logger; 

@@ -252,6 +252,13 @@ export class AuthManager extends EventEmitter {
    * Authenticate using OAuth flow
    */
   private async authenticateWithOAuth(): Promise<AuthResult> {
+    if (!this.config.oauth) {
+      return {
+        success: false,
+        error: 'OAuth configuration is missing',
+        state: AuthState.FAILED
+      };
+    }
     return performOAuthFlow(this.config.oauth);
   }
 
@@ -267,6 +274,9 @@ export class AuthManager extends EventEmitter {
     logger.debug('Refreshing authentication token');
     
     try {
+      if (!this.config.oauth) {
+        throw new Error('OAuth configuration is missing');
+      }
       const newToken = await refreshOAuthToken(this.currentToken.refreshToken, this.config.oauth);
       
       // Update the current token
@@ -329,7 +339,7 @@ export class AuthManager extends EventEmitter {
    */
   private setState(newState: AuthState): void {
     if (this.state !== newState) {
-      logger.debug(`Authentication state changed: ${AuthState[this.state]} → ${AuthState[newState]}`);
+      logger.debug(`Authentication state changed: ${this.state} → ${newState}`);
       this.state = newState;
       this.emit(AUTH_EVENTS.STATE_CHANGED, newState);
     }

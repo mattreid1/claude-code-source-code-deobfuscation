@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/src/cli.js",
-    "dev": "ts-node --esm src/cli.ts",
+    "dev": "tsx src/cli.ts",
     "test": "jest",
     "lint": "eslint src",
     "clean": "rm -rf dist"
@@ -26,18 +26,25 @@
   "author": "Anthropic",
   "license": "MIT",
   "dependencies": {
+    "inquirer": "^12.4.2",
     "node-fetch": "^3.3.1",
-    "open": "^9.1.0"
+    "open": "^9.1.0",
+    "ora": "^8.2.0",
+    "table": "^6.9.0",
+    "terminal-link": "^3.0.0",
+    "uuid": "^11.1.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/node": "^20.4.7",
-    "typescript": "^5.1.6",
-    "ts-node": "^10.9.1",
-    "eslint": "^8.46.0",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
-    "@typescript-eslint/parser": "^6.2.1"
+    "@typescript-eslint/parser": "^6.2.1",
+    "eslint": "^8.46.0",
+    "ts-node": "^10.9.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.1.6"
   },
   "engines": {
     "node": ">=18.0.0"
   }
-} 
+}

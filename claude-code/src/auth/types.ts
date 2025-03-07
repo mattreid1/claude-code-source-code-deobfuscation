@@ -57,41 +57,26 @@ export enum AuthMethod {
 /**
  * Authentication states
  */
-export enum AuthState {
-  /**
-   * Initial state
-   */
-  INITIAL = 'initial',
-  
-  /**
-   * Authentication in progress
-   */
-  AUTHENTICATING = 'authenticating',
-  
-  /**
-   * Successfully authenticated
-   */
-  AUTHENTICATED = 'authenticated',
-  
-  /**
-   * Authentication failed
-   */
-  FAILED = 'failed',
-  
-  /**
-   * Refreshing authentication
-   */
-  REFRESHING = 'refreshing',
-  
-  /**
-   * Expired authentication
-   */
-  EXPIRED = 'expired',
-  
-  /**
-   * Unauthenticated state
-   */
-  UNAUTHENTICATED = 'unauthenticated'
+export type AuthState = 
+  | 'initial'
+  | 'authenticating'
+  | 'authenticated'
+  | 'failed'
+  | 'refreshing'
+  | 'expired'
+  | 'unauthenticated';
+
+/**
+ * Authentication state constants
+ */
+export const AuthState = {
+  INITIAL: 'initial' as AuthState,
+  AUTHENTICATING: 'authenticating' as AuthState,
+  AUTHENTICATED: 'authenticated' as AuthState,
+  FAILED: 'failed' as AuthState,
+  REFRESHING: 'refreshing' as AuthState,
+  EXPIRED: 'expired' as AuthState,
+  UNAUTHENTICATED: 'unauthenticated' as AuthState
 }
 
 /**
